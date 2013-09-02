@@ -1,4 +1,5 @@
 testing
 =======
 
-テストを味わう
+
+    php composer.phar install
