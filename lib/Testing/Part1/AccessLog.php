@@ -16,6 +16,9 @@ class AccessLog {
    *
    */
   public function __construct($path) {
+    if (!file_exists($path)) {
+      throw new \Exception('ファイルが存在しません');
+    }
     $this->path = $path;
   }
 
@@ -29,10 +32,6 @@ class AccessLog {
   public function getLineCountByStatusCode($status_code) {
 
     try {
-
-      if (!file_exists($this->path)) {
-        throw new \Exception('ファイルが存在しません');
-      }
 
       // 入力チェック
       if (!is_numeric($status_code) || strlen($status_code) != 3) {
