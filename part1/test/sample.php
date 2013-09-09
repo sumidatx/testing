@@ -11,9 +11,9 @@ class SampleTest extends PHPUnit_Framework_TestCase
 			500 => 500, 501 => 501, 502 => 502, 503 => 503, 504 => 504, 505 => 505,);
 
 	public function setUp() {
-		$this->file_path = __DIR__ . '../data/access_log';
+		$this->file_path = dirname(__DIR__) . '/data/access_log';
 		$this->access_log =  new \Testing\Part1\AccessLog($this->file_path);
-		$this->file_pointer = fopen($this->file_path);
+		$this->file_pointer = fopen($this->file_path, "r");
 	}
 
 	public function test有効なパスの初期化テスト()
