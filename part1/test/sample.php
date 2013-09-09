@@ -3,7 +3,7 @@ require_once __DIR__."/../../vendor/autoload.php";
 
 class SampleTest extends PHPUnit_Framework_TestCase
 {
-	const FILEPATH = '../data/access_log';
+	private $file_path = null;
 	private $status_codes = array(100 => 100, 101 => 101,
 			200 => 200, 201 => 201, 202 => 202, 203 => 203, 204 => 204, 205 => 205, 206 =>206,
 			300 => 300, 301 => 301, 302 => 302, 303 => 303, 304 => 304, 305 => 305,
@@ -11,14 +11,15 @@ class SampleTest extends PHPUnit_Framework_TestCase
 			500 => 500, 501 => 501, 502 => 502, 503 => 503, 504 => 504, 505 => 505,);
 
 	public function setUp() {
-		$this->access_log =  new \Testing\Part1\AccessLog(self::FILEPATH);
-		$this->file_pointer = fopen(self::FILEPATH);
+		$this->file_path = __DIR__ . '../data/access_log';
+		$this->access_log =  new \Testing\Part1\AccessLog($this->file_path);
+		$this->file_pointer = fopen($this->file_path);
 	}
 
 	public function test有効なパスの初期化テスト()
 	{
 		try {
-			$access_log = new \Testing\Part1\AccessLog(self::FILEPATH);
+			$access_log = new \Testing\Part1\AccessLog($this->file_path);
 		}
 		catch(Exception $e)
 		{
@@ -93,14 +94,25 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
 	public function test無効なステータスコードが入力されましてよ()
 	{
+
 		try
 		{
-			$count = $this->access_log->getLineCountByStatusCode(3333);
-			$this->fail($message = '無効なステータスコードが入力されたのに例外が発生しなかった');
+			$count = $this->access_log->getLineCountByStatusCode(33);
+			$this->fail($message = '無効なステータスコード(2桁数値)が入力されたのに例外が発生しなかった');
 		}
 		catch(Exception $e)
 		{
-			$this->assertTrue(true, $message = '無効なステータスコードが入力されたので例外発生成功');
+			$this->assertTrue(true, $message = '無効なステータスコード(2桁数値)が入力されたので例外発生成功');
+		}
+
+		try
+		{
+			$count = $this->access_log->getLineCountByStatusCode(3333);
+			$this->fail($message = '無効なステータスコード(4桁数値)が入力されたのに例外が発生しなかった');
+		}
+		catch(Exception $e)
+		{
+			$this->assertTrue(true, $message = '無効なステータスコード(4桁数値)が入力されたので例外発生成功');
 		}
 
 		try
