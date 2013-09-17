@@ -17,17 +17,46 @@ class Sort
    * 
    * @param array $array
    */
-  public function sort(array $array)
+  public function sort($array)
   {
-    
+    if(! is_array($array))
+    {
+      throw new \Exception("配列以外やでー");
+    }
+    if(count($array) == 0) return array();
+
+    foreach($array as $val)
+    {
+        if(is_numeric($val))
+        {
+            $numerics[] = $val;
+        }
+        elseif(is_string($val))
+        {
+            $strings[] = $val;
+        }
+        else
+        {
+            throw new \Exception("文字と数値以外だぜ");
+        }
+    }
+
+    sort($numerics);
+    sort($strings);
+
+    $array = array_merge($numerics, $strings);
+
+    return $array;
   }
   
   /**
    * 降順にソートします。
    * @param array $array
    */
-  public function rsort(array $array)
+  public function rsort($array)
   {
-    
+    $sorted = $this->sort($array);
+
+    return array_reverse($sorted);
   }
 }
