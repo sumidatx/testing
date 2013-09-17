@@ -17,7 +17,7 @@ class SampleTest extends PHPUnit_Framework_TestCase
   }
 
 
-  public function test入力値_ascOk ()
+  public function test入力値_昇順_OK ()
   {
     $okCaseArray = array(
       array(array(4, 2, 1, 3), array(1, 2, 3, 4),  '数値の配列'),
@@ -34,7 +34,7 @@ class SampleTest extends PHPUnit_Framework_TestCase
       $this->assertEquals($expected, $got, $msg);
     };
   }
-  public function test入力値_descOk ()
+  public function test入力値_降順_OK ()
   {
     $okCaseArray = array(
       array(array(4, 2, 1, 3), array(4, 3, 2, 1),  '数値の配列'),
@@ -52,7 +52,7 @@ class SampleTest extends PHPUnit_Framework_TestCase
     };
   }
 
-  public function test入力値_ng ()
+  public function test入力値_NG ()
   {
     $okCaseArray = array(
       array(array(new stdClass), 'オブジェクト'),
