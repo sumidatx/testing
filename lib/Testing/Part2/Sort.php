@@ -25,6 +25,9 @@ class Sort
     }
     if(count($array) == 0) return array();
 
+    $numerics = array();
+    $strings = array();
+
     foreach($array as $val)
     {
         if(is_numeric($val))
