@@ -5,15 +5,15 @@ class SampleTest extends PHPUnit_Framework_TestCase
 {
   public function testSample()
   {
-    $got = "hoge";
+    $actual = "hoge";
     $expected = "hoge";
-    $this->assertEquals($got, $expected);
+    $this->assertEquals($expected, $actual);
   }
 
   public function testInvalidSample()
   {
-    $got = "ihoge";
+    $actual = "ihoge";
     $expected = "hoge";
-    $this->assertEquals($got, $expected, "同じ値でないといけない");
+    $this->assertEquals($expected, $actual, "同じ値でないといけない");
   }
 }
