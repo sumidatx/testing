@@ -29,8 +29,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
     );
     foreach ($okCaseArray as $case) {
       list($input, $expected, $msg) = $case;
-      $got = $this->sortobject->sort($input);
-      $this->assertEquals($expected, $got, $msg);
+      $actual = $this->sortobject->sort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
   public function test入力値_降順_OK ()
@@ -47,8 +47,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
     );
     foreach ($okCaseArray as $case) {
       list($input, $expected, $msg) = $case;
-      $got = $this->sortobject->rsort($input);
-      $this->assertEquals($expected, $got, $msg);
+      $actual = $this->sortobject->rsort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 
@@ -69,7 +69,7 @@ class SampleTest extends PHPUnit_Framework_TestCase
     foreach ($ngCaseArray as $case) {
       list($input, $msg) = $case;
       try {
-        $got = $this->sortobject->sort($input);
+        $actual = $this->sortobject->sort($input);
       } catch (Exception $e) {
         return;
       }
@@ -91,8 +91,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $case) {
       list($input, $expected, $msg) = $case;
-      $got = $this->sortobject->sort($input);
-      $this->assertEquals($expected, $got, $msg);
+      $actual = $this->sortobject->sort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 
@@ -110,8 +110,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $case) {
       list($input, $msg) = $case;
-      $got = $this->sortobject->rsort($input);
-      $this->assertEquals($input, $got, $msg);
+      $actual = $this->sortobject->rsort($input);
+      $this->assertEquals($input, $actual, $msg);
     };
   }
 
@@ -133,8 +133,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $case) {
       list($input, $expected, $msg) = $case;
-      $got = $this->sortobject->sort($input);
-      $this->assertEquals($expected, $got, $msg);
+      $actual = $this->sortobject->sort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 
@@ -152,8 +152,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $case) {
       list($input, $msg) = $case;
-      $got = $this->sortobject->rsort($input);
-      $this->assertEquals($input, $got, $msg);
+      $actual = $this->sortobject->rsort($input);
+      $this->assertEquals($input, $actual, $msg);
     };
   }
 
@@ -167,8 +167,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $case) {
       list($input, $expected, $msg) = $case;
-      $got = $this->sortobject->sort($input);
-      $this->assertEquals($expected, $got, $msg);
+      $actual = $this->sortobject->sort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 
@@ -182,8 +182,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $case) {
       list($input, $expected, $msg) = $case;
-      $got = $this->sortobject->rsort($input);
-      $this->assertEquals($expected, $got, $msg);
+      $actual = $this->sortobject->rsort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 }
