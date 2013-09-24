@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__."/../../vendor/autoload.php";
 
-
 class SampleTest extends PHPUnit_Framework_TestCase
 {
   private $sortobject = null;
@@ -16,49 +15,46 @@ class SampleTest extends PHPUnit_Framework_TestCase
     $this->sortobject = null;
   }
 
-
   public function test入力値_昇順_OK ()
   {
     $okCaseArray = array(
       // array(input, expected, msg)
-      array(array(4, 2, 1, 3), array(1, 2, 3, 4),                    '数値の配列'),
-      array(array("b", "a", "d", "c" ), array("a", "b", "c", "d"),   '文字列の配列'),
-      array(array(), array(),                                        '空の配列'),
+      array(array(4, 2, 1, 3),            array(1, 2, 3, 4),         '数値の配列'),
+      array(array("b", "a", "d", "c" ),   array("a", "b", "c", "d"), '文字列の配列'),
+      array(array(),                      array(),                   '空の配列'),
       array(array("4", "a", 1, "b", "5"), array( 1, 4, 5, "a", "b"), '混在している配列'),
       array(
         array("もり", "ふくだ", "こやなぎ"),
         array("こやなぎ", "ふくだ", "もり"),                         '全角文字列'),
     );
-    foreach( $okCaseArray as $case ) {
-      $msg = array_pop($case);
-      $got = $this->sortobject->sort($case[0]);
-      $expected = $case[1];
-      $this->assertEquals($expected, $got, $msg);
+    foreach ($okCaseArray as $case) {
+      list($input, $expected, $msg) = $case;
+      $actual = $this->sortobject->sort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
   public function test入力値_降順_OK ()
   {
     $okCaseArray = array(
       // array(input, expected, msg)
-      array(array(4, 2, 1, 3), array(4, 3, 2, 1),                   '数値の配列'),
-      array(array("b", "a", "d", "c" ), array("d", "c", "b", "a"),  '文字列の配列'),
-      array(array(), array(),                                       '空の配列'),
-      array(array("4", "a", 1, "b", "5"), array("b", "a", 5, 4, 1), '混在している配列'),
+      array(array(4, 2, 1, 3),            array(4, 3, 2, 1),         '数値の配列'),
+      array(array("b", "a", "d", "c" ),   array("d", "c", "b", "a"), '文字列の配列'),
+      array(array(), array(),                                        '空の配列'),
+      array(array("4", "a", 1, "b", "5"), array("b", "a", 5, 4, 1),  '混在している配列'),
       array(
         array("ふくだ", "もり", "こやなぎ"),
-        array("もり", "ふくだ", "こやなぎ"),                        '全角文字列'),
+        array("もり", "ふくだ", "こやなぎ"),                         '全角文字列'),
     );
-    foreach( $okCaseArray as $case ) {
-      $msg = array_pop($case);
-      $got = $this->sortobject->rsort($case[0]);
-      $expected = $case[1];
-      $this->assertEquals($expected, $got, $msg);
+    foreach ($okCaseArray as $case) {
+      list($input, $expected, $msg) = $case;
+      $actual = $this->sortobject->rsort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 
   public function test入力値_NG ()
   {
-    $okCaseArray = array(
+    $ngCaseArray = array(
       // array(input&expected, msg)
       array(array(new stdClass),      'オブジェクトを含む'),
       array(array(true, false),       '真偽値を含む'),
@@ -70,14 +66,12 @@ class SampleTest extends PHPUnit_Framework_TestCase
       array()
     );
 
-    foreach( $okCaseArray as $case ) {
-      $msg = array_pop($case);
-      try{
-        $got = $this->sortobject->sort($case[0]);
-      }
-      catch(Exception $e)
-      {
-        return;
+    foreach ($ngCaseArray as $case) {
+      list($input, $msg) = $case;
+      try {
+        $actual = $this->sortobject->sort($input);
+      } catch (Exception $e) {
+        continue;
       }
       $this->fail($msg);
     };
@@ -87,19 +81,18 @@ class SampleTest extends PHPUnit_Framework_TestCase
   {
     $okCaseArray = array(
       // array(input, expected, msg)
-      array(array(1, 10, 5, 2, 8, 20), array(1, 2, 5, 8, 10, 20),       'ソート済み'),
-      array(array(1.2, 5.5, 2.1, 3.3), array(1.2, 2.1, 3.3, 5.5),       '少数'),
+      array(array(1, 10, 5, 2, 8, 20),    array(1, 2, 5, 8, 10, 20),    'ソート済み'),
+      array(array(1.2, 5.5, 2.1, 3.3),    array(1.2, 2.1, 3.3, 5.5),    '少数'),
       array(array(1, 10, -5, 2, -8, -20), array(-20, -8, -5, 1, 2, 10), 'マイナス'),
       array(array(1, 10, 5, 2, 0, 8, 20), array(0, 1, 2, 5, 8, 10, 20), 'ゼロを含む'),
-      array(array(1, 5, 8, 20, 8, 5, 8), array(1, 5, 5, 8, 8, 8, 20),   '同じ数値を含む'),
-      array(array(2, 2, 2, 2), array(2, 2, 2, 2),                       '同じ数値だけ'),
+      array(array(1, 5, 8, 20, 8, 5, 8),  array(1, 5, 5, 8, 8, 8, 20),  '同じ数値を含む'),
+      array(array(2, 2, 2, 2),            array(2, 2, 2, 2),            '同じ数値だけ'),
     );
 
-    foreach( $okCaseArray as $case ) {
-      $msg = array_pop($case);
-      $got = $this->sortobject->sort($case[0]);
-      $expected = $case[1];
-      $this->assertEquals($expected, $got, $msg);
+    foreach ($okCaseArray as $case) {
+      list($input, $expected, $msg) = $case;
+      $actual = $this->sortobject->sort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 
@@ -115,11 +108,10 @@ class SampleTest extends PHPUnit_Framework_TestCase
       array(array(2, 2, 2, 2),            '同じ数値だけ'),
     );
 
-    foreach( $okCaseArray as $case ) {
-      $msg = array_pop($case);
-      $got = $this->sortobject->rsort($case[0]);
-      $expected = $case[0];
-      $this->assertEquals($expected, $got, $msg);
+    foreach ($okCaseArray as $case) {
+      list($input, $msg) = $case;
+      $actual = $this->sortobject->rsort($input);
+      $this->assertEquals($input, $actual, $msg);
     };
   }
 
@@ -127,10 +119,9 @@ class SampleTest extends PHPUnit_Framework_TestCase
   {
     $okCaseArray = array(
       // array(input, expected, msg)
-      array(array(20, 10, 5, 2, 1),       'ソート済み'),
-      array(array("d", "b", "a", "c"), array("a", "b", "c", "d"),           '一文字'),
-      array(array("dd", 'bb', 'aa', 'cc'), array('aa', 'bb', 'cc', 'dd'),   '二文字'),
-      array(array('', '', '', '', ''), array('', '', '', '', ''),           'すべて空文字'),
+      array(array("d", "b", "a", "c"),      array("a", "b", "c", "d"),      '一文字'),
+      array(array("dd", 'bb', 'aa', 'cc'),  array('aa', 'bb', 'cc', 'dd'),  '二文字'),
+      array(array('', '', '', '', ''),      array('', '', '', '', ''),      'すべて空文字'),
       array(array(' ', ' ', ' ', ' ', ' '), array(' ', ' ', ' ', ' ', ' '), 'すべて半角スペース'),
       array(
         array("\n\n", "\n\n", "\n\n", "\n\n", "\n\n"),
@@ -140,11 +131,10 @@ class SampleTest extends PHPUnit_Framework_TestCase
         array('', "\n\n", " ", "a", "aa"),                                  '一文字二文字空文字半角スペース改行'),
     );
 
-    foreach( $okCaseArray as $case ) {
-      $msg = array_pop($case);
-      $got = $this->sortobject->sort($case[0]);
-      $expected = $case[1];
-      $this->assertEquals($expected, $got, $msg);
+    foreach ($okCaseArray as $case) {
+      list($input, $expected, $msg) = $case;
+      $actual = $this->sortobject->sort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 
@@ -160,11 +150,10 @@ class SampleTest extends PHPUnit_Framework_TestCase
       array(array('aa', 'a', " ", "\n\n", ""),             '一文字二文字空文字半角スペース全角改行'),
     );
 
-    foreach( $okCaseArray as $case ) {
-      $msg = array_pop($case);
-      $got = $this->sortobject->rsort($case[0]);
-      $expected = $case[0];
-      $this->assertEquals($expected, $got, $msg);
+    foreach ($okCaseArray as $case) {
+      list($input, $msg) = $case;
+      $actual = $this->sortobject->rsort($input);
+      $this->assertEquals($input, $actual, $msg);
     };
   }
 
@@ -176,11 +165,10 @@ class SampleTest extends PHPUnit_Framework_TestCase
       array(array("aa", "a", 0, 10, 1, "", " ", "\n\n"), array(0, 1, 10, '', "\n\n", " ", "a", "aa"), '混在'),
     );
 
-    foreach( $okCaseArray as $case ) {
-      $msg = array_pop($case);
-      $got = $this->sortobject->sort($case[0]);
-      $expected = $case[1];
-      $this->assertEquals($expected, $got, $msg);
+    foreach ($okCaseArray as $case) {
+      list($input, $expected, $msg) = $case;
+      $actual = $this->sortobject->sort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 
@@ -192,12 +180,10 @@ class SampleTest extends PHPUnit_Framework_TestCase
       array(array("a", "aa", 0, 10, 1,"", " ", "\n\n"), array("aa", "a", " ", "\n\n", "", 10, 1, 0), '混在'),
     );
 
-    foreach( $okCaseArray as $case ) {
-      $msg = array_pop($case);
-      $got = $this->sortobject->rsort($case[0]);
-      $expected = $case[1];
-      $this->assertEquals($expected, $got, $msg);
+    foreach ($okCaseArray as $case) {
+      list($input, $expected, $msg) = $case;
+      $actual = $this->sortobject->rsort($input);
+      $this->assertEquals($expected, $actual, $msg);
     };
   }
 }
-
