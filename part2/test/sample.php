@@ -71,7 +71,7 @@ class SampleTest extends PHPUnit_Framework_TestCase
       try {
         $actual = $this->sortobject->sort($input);
       } catch (Exception $e) {
-        return;
+        continue;
       }
       $this->fail($msg);
     };
