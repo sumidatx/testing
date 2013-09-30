@@ -5,7 +5,8 @@
     "autoload": {
         "psr-0": {
             "Testing\\Part1\\": "lib/",
-            "Testing\\Part2\\": "lib/"
+            "Testing\\Part2\\": "lib/",
+            "Testing\\Part3\\": "lib/"
         }
     }
 }
