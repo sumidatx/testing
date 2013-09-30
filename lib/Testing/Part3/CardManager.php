@@ -31,7 +31,7 @@ class CardManager
 			throw new \Exception($message = '受け取った配列に入力必須のプロパティが無いじゃん');
 		}
 
-		$dummy_query = $params;
+		$dummy_query = '';
 		$result = DI::make('DB')->method_insert($dummy_query);
 
 		$card = DI::make('Card');
@@ -58,7 +58,7 @@ class CardManager
 			throw new \Exception($message = '$idが数値ではなかったよねー');
 		}
 
-		$dummy_query = $id;
+		$dummy_query = '';
 		$result = DI::make('DB')->method_select($dummy_query);
 
 		if(is_null($result))
@@ -95,7 +95,7 @@ class CardManager
 			throw new \Exception($message = 'idは更新できません');
 		}
 
-		$dummy_query = array_merge(array($id), $params);
+		$dummy_query = '';
 		$result = DI::make('DB')->method_update($dummy_query);
 		if(is_null($result))
 		{
@@ -122,7 +122,7 @@ class CardManager
 	 */
 	public function delete($id)
 	{
-		$dummy_query = $id;
+		$dummy_query = '';
 		$result = DI::make('DB')->method_delete($dummy_query);
 		if(! $result)
 		{
