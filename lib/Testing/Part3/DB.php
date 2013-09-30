@@ -9,7 +9,7 @@ class DB
    */
   public function method_insert($query)
   {
-    throw new BadMethodCallException('dameyo');
+    throw new \BadMethodCallException('dameyo');
   }
   
   /**
@@ -19,7 +19,7 @@ class DB
    */
   public function method_select($query)
   {
-    throw new BadMethodCallException('dameyo');
+    throw new \BadMethodCallException('dameyo');
   }
   
   /**
@@ -29,7 +29,7 @@ class DB
    */
   public function method_update($query)
   {
-    throw new BadMethodCallException('dameyo');
+    throw new \BadMethodCallException('dameyo');
   }
   
   /**
@@ -39,6 +39,6 @@ class DB
    */
   public function method_delete($query)
   {
-    throw new BadMethodCallException('dameyo');
+    throw new \BadMethodCallException('dameyo');
   }
 }
