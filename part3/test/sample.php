@@ -39,9 +39,14 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $id => $case) {
       list($input, $msg) = $case;
+      $expected = $input + array('id' => $id);
+      $stub = $this->getMock('\Testing\Part3\DB')
+                   ->expects($this->any())
+                   ->method('method_insert')
+                   ->will($this->returnValue($expected));
+      DI::bind('DB', $stub);
       $result = $this->card_manager->create($input);
       $actual = get_object_vars($result);
-      $expected = $input + array('id' => $id);
       $this->assertEquals($expected, $actual, $msg);
     }
   }
@@ -55,6 +60,12 @@ class SampleTest extends PHPUnit_Framework_TestCase
       array('input' => array('description' => '説明'), 'msg' => '入力必須プロパティ(name)が無い'),
     );
 
+    $stub = $this->getMock('\Testing\Part3\DB')
+                 ->expects($this->never())
+                 ->method('method_insert')
+                 ->will($this->throwException(new \InvalidArgumentException()));
+    DI::bind('DB', $stub);
+
     foreach ($ngCaseArray as $case) {
       try {
         if (array_key_exists('input', $case)) {
@@ -65,6 +76,7 @@ class SampleTest extends PHPUnit_Framework_TestCase
         $this->fail($case['msg']);
       } catch (Exception $e) {
         $this->assertTrue(true, $case['msg']);
+        $this->assertEquals('受け取った配列に入力必須のプロパティが無いじゃん', $e->getMessage());
       }
     }
   }
@@ -81,24 +93,40 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $id => $case) {
       list($input, $msg) = $case;
+      $expected = $input + array('id' => $id);
+      $stub = $this->getMock('\Testing\Part3\DB')
+                   ->expects($this->any())
+                   ->method('method_select')
+                   ->will($this->returnValue($expected));
+      DI::bind('DB', $stub);
       $this->card_manager->create($input);
       $result = $this->card_manager->read($id);
       $actual = get_object_vars($result);
-      $expected = $input + array('id' => $id);
       $this->assertEquals($expected, $actual, $msg);
     }
   }
 
   public function test読み取り_NG()
   {
-    $id = 1;
-    $msg = '存在しないidを指定';
+    $ngCaseArray = array(
+      // array(id, expects, msg)
+      array(1,      '存在しないidを指定', 1, '$idが数値ではなかったよねー'),
+      array('hoge', '数値以外を指定',     0, 'idが存在しないだろ、てやんでぃ'),
+    );
 
-    try {
-      $this->card_manager->read($id);
-      $this->fail($msg);
-    } catch (Exception $e) {
-      $this->assertTrue(true, $msg);
+    foreach ($ngCaseArray as $case) {
+      list($id, $msg, $expects, $error_msg) = $case;
+      $stub = $this->getMock('\Testing\Part3\DB')
+                   ->expects($this->at($expects))
+                   ->method('method_select')
+                   ->will($this->throwException(new \InvalidArgumentException()));
+      DI::bind('DB', $stub);
+      try {
+        $this->card_manager->read($id);
+        $this->fail($msg);
+      } catch (Exception $e) {
+        $this->assertEquals($error_msg, $e->getMessage(), $msg);
+      }
     }
   }
 
@@ -128,6 +156,11 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $id => $case) {
       list($input, $update, $expected, $msg) = $case;
+      $stub = $this->getMock('\Testing\Part3\DB')
+                   ->expects($this->any())
+                   ->method('method_update')
+                   ->will($this->returnValue($expected));
+      DI::bind('DB', $stub);
       $this->card_manager->create($input);
       $actual = $this->card_manager->update($id, $update);
       $this->assertEquals($expected, $actual, $msg);
@@ -137,31 +170,45 @@ class SampleTest extends PHPUnit_Framework_TestCase
   public function test更新_NG()
   {
     $ngCaseArray = array(
-      // id => array(input, update, update_id, msg)
-      1 => array(
+      // id => array(input, update, msg, expects, error_msg)
+      array(
         array('name' => 'カード1', 'description' => '説明1'),
-        array('name' => 'カードA', 'description' => '説明A'),
-        9,
-        '存在しないidを更新'
+        array($update_id = 9, array('name' => 'カードA', 'description' => '説明A')),
+        '存在しないidを更新',
+        $expects = 1,
+        'idが存在しない'
       ),
-      2 => array(
-        array(           'name' => 'カード2', 'description' => '説明2'),
-        array('id' => 2, 'name' => 'カードB', 'description' => '説明B'),
-        2,
-        '更新値にidを含む'
+      array(
+        array('name' => 'カード2', 'description' => '説明2'),
+        array($update_id = 2, array('id' => 2, 'name' => 'カードB', 'description' => '説明B')),
+        '更新値にidを含む',
+        $expects = 0,
+        'idは更新できません'
       ),
     );
 
-    foreach ($ngCaseArray as $id => $case) {
-      list($input, $update, $update_id, $msg) = $case;
+    $stub = $this->getMock('\Testing\Part3\DB');
+
+    foreach ($ngCaseArray as $case) {
+      list($input, $update, $msg, $expects, $error_msg) = $case;
+      $stub = $this->getMock('\Testing\Part3\DB')
+                   ->expects($this->at($expects))
+                   ->method('method_update')
+                   ->will($this->throwException(new \InvalidArgumentException()));
+      DI::bind('DB', $stub);
       try {
         $this->card_manager->create($input);
-        $this->card_manager->update($update_id, $update);
+        $this->callCardManagerUpdate($this->card_manager, $update);
         $this->fail($msg);
       } catch (Exception $e) {
-        $this->assertTrue(true, $msg);
+        $this->assertEquals($error_msg, $e->getMessage(), $msg);
       }
     }
+  }
+
+  private function callCardManagerUpdate(CardManager $instance, $param)
+  {
+    return call_user_func_array(array($instance, 'update'), $update);
   }
 
   public function test削除_OK()
@@ -176,6 +223,11 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     foreach ($okCaseArray as $id => $case) {
       list($input, $msg) = $case;
+      $stub = $this->getMock('\Testing\Part3\DB')
+                   ->expects($this->any())
+                   ->method('method_delete')
+                   ->will($this->returnValue(true));
+      DI::bind('DB', $stub);
       $this->card_manager->create($input);
       $actual = $this->card_manager->delete($id);
       $this->assertTrue($actual, $msg);
@@ -185,22 +237,29 @@ class SampleTest extends PHPUnit_Framework_TestCase
   public function test削除_NG()
   {
     $ngCaseArray = array(
-      // id => array(input, delete_id, msg)
+      // id => array(input, delete_id, msg, expects, error_msg)
       1 => array(
         array('name' => 'カード1', 'description' => '説明1'),
         9,
-        '存在しないidを指定'
+        '存在しないidを指定',
+        $expects = 1,
+        '削除失敗'
       ),
     );
 
     foreach ($ngCaseArray as $id => $case) {
-      list($input, $delete_id, $msg) = $case;
+      list($input, $delete_id, $msg, $expects, $error_msg) = $case;
+      $stub = $this->getMock('\Testing\Part3\DB')
+                   ->expects($this->at($expects))
+                   ->method('method_delete')
+                   ->will($this->throwException(new \OutOfboundsException()));
+      DI::bind('DB', $stub);
       try {
         $this->card_manager->create($input);
         $this->card_manager->delete($delete_id);
         $this->fail($msg);
       } catch (Exception $e) {
-        $this->assertTrue(true, $msg);
+        $this->assertEquals($error_msg, $e->getMessage(), $msg);
       }
     }
   }
