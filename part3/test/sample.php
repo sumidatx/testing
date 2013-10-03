@@ -7,6 +7,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
   public function setup()
   {
+    \Testing\Part3\DI::bind('DB', null);
+    \Testing\Part3\DI::bind('Card', null);
     $this->card_manager = new \Testing\Part3\CardManager();
   }
 
@@ -15,8 +17,8 @@ class SampleTest extends PHPUnit_Framework_TestCase
     $this->card_manager = null;
   }
 
-  /*
-   * @dataProvider provider_作成_OK
+  /**
+   * @dataProvider provider_test作成_OK
    */
   public function test作成_OK($input, $mock_args, $msg, $expected)
   {
@@ -32,34 +34,34 @@ class SampleTest extends PHPUnit_Framework_TestCase
     $this->assertEquals($expected, $actual, $msg);
   }
 
-  public function provider_作成_OK()
+  public function provider_test作成_OK()
   {
-    // 実際はinputによって変わる
+    // 実際は入力値によって変わる
     $mock_args = '';
 
     return array(
       array(
         array('name' => 'カード1', 'description' => '説明1'),
         $mock_args,
-        '1件目のレコード',
+        '入力値にnameとdescriptionがある',
         array('id' => 1,'name' => 'カード1', 'description' => '説明1')
       ),
-      array(
-        array('name' => 'カード2', 'description' => '説明2'),
-        $mock_args,
-        '2件目のレコード(連番チェック)',
-        array('id' => 2,'name' => 'カード2', 'description' => '説明2')
-      ),
+      //array(
+      //  array('name' => 'カード2', 'description' => '説明2'),
+      //  $mock_args,
+      //  '2件目の作成(連番チェック)',
+      //  array('id' => 2,'name' => 'カード2', 'description' => '説明2')
+      //),
       array(
         array('name' => 'カード3'),
         $mock_args,
-        'descriptionが無い',
-        array('id' => 3, 'name' => 'カード3'),
+        '入力値にdescriptionが無い',
+        array('id' => 3, 'name' => 'カード3', 'description' => null),
       ),
       array(
         array('name' => 'カード4', 'description' => '説明4', 'title' => 'タイトル'),
         $mock_args,
-        '存在しないプロパティ(title)を含む',
+        '入力値にtitle(存在しないプロパティ)を含む',
         array('id' => 4, 'name' => 'カード4', 'description' => '説明4', 'title' => 'タイトル'),
       )
     );
@@ -67,7 +69,7 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
   public function test作成_NG()
   {
-    $msg = '作成NG';
+    $msg = '入力値にnameが無い';
     $input = array('description' => '説明');
     $error_msg = '受け取った配列に入力必須のプロパティが無いじゃん';
     try {
@@ -79,7 +81,7 @@ class SampleTest extends PHPUnit_Framework_TestCase
   }
 
   // 引数チェック
-  /*
+  /**
    * @dataProvider provider_作成_NG
    */
   public function _test作成_NG($input, $msg)
@@ -115,15 +117,16 @@ class SampleTest extends PHPUnit_Framework_TestCase
   public function test読み取り_OK()
   {
     $msg = '読み取りOK';
-    $query = '';
+    $mock_args = '';
     $expected = array('id' => 1, 'name' => 'カード1', 'description' => '説明1');
 
     $mock = $this->getMock('\Testing\Part3\DB');
     $mock->expects($this->once())
          ->method('method_select')
-         ->with($this->equalTo($query))
+         ->with($this->equalTo($mock_args))
          ->will($this->returnValue($expected));
     \Testing\Part3\DI::bind('DB', $mock);
+
     $result = $this->card_manager->read(1);
     $actual = get_object_vars($result);
     $this->assertEquals($expected, $actual, $msg);
@@ -143,11 +146,11 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     $msg = '存在しないidを指定';
     $error_msg = 'idが存在しないだろ、てやんでぃ';
-    $query = '';
+    $mock_args = '';
     $mock = $this->getMock('\Testing\Part3\DB');
     $mock->expects($this->once())
          ->method('method_select')
-         ->with($this->equalTo($query))
+         ->with($this->equalTo($mock_args))
          ->will($this->returnValue(null));
     \Testing\Part3\DI::bind('DB', $mock);
     try {
@@ -164,24 +167,43 @@ class SampleTest extends PHPUnit_Framework_TestCase
   // ・paramsが無いとき(引数1つ)
   // ・idにnullが指定されているとき
   // ・paramsにnullが指定されているとき
-  public function test更新_OK()
+  /**
+   * @dataProvider provider_test更新_OK
+   */
+  public function test更新_OK($mock_args, $return_value, $expected)
   {
     $msg = '更新OK';
     $params = array();
-    $query = '';
-    $return_value = array();
-    $expected = array('id' => null, 'name' => null, 'description' => null);
 
     $mock = $this->getMock('\Testing\Part3\DB');
     $mock->expects($this->once())
          ->method('method_update')
-         ->with($this->equalTo($query))
+         ->with($this->equalTo($mock_args))
          ->will($this->returnValue($return_value));
     \Testing\Part3\DI::bind('DB', $mock);
 
     $result = $this->card_manager->update(1, $params);
     $actual = get_object_vars($result);
     $this->assertEquals($expected, $actual, $msg);
+  }
+
+  public function provider_test更新_OK()
+  {
+    // 実際は更新値によって変わる
+    $mock_args = '';
+
+    return array(
+      array(
+        $mock_args,
+        array(),
+        array('id' => null,'name' => null, 'description' => null)
+      ),
+      array(
+        $mock_args,
+        array('id' => 1, 'name' => 'カード1', 'description' => '説明1'),
+        array('id' => 1, 'name' => 'カード1', 'description' => '説明1'),
+      )
+    );
   }
 
   public function test更新_NG()
@@ -198,11 +220,11 @@ class SampleTest extends PHPUnit_Framework_TestCase
 
     $msg = '更新NG(該当データ無し)';
     $params = array();
-    $query = '';
+    $mock_args = '';
     $mock = $this->getMock('\Testing\Part3\DB');
     $mock->expects($this->once())
          ->method('method_update')
-         ->with($this->equalTo($query))
+         ->with($this->equalTo($mock_args))
          ->will($this->returnValue(null));
     \Testing\Part3\DI::bind('DB', $mock);
     try {
@@ -216,12 +238,12 @@ class SampleTest extends PHPUnit_Framework_TestCase
   public function test削除_OK()
   {
     $msg = '削除OK';
-    $query = '';
+    $mock_args = '';
 
     $mock = $this->getMock('\Testing\Part3\DB');
     $mock->expects($this->once())
          ->method('method_delete')
-         ->with($this->equalTo($query))
+         ->with($this->equalTo($mock_args))
          ->will($this->returnValue(true));
     \Testing\Part3\DI::bind('DB', $mock);
 
@@ -233,12 +255,12 @@ class SampleTest extends PHPUnit_Framework_TestCase
   {
     $msg = '削除NG';
     $error_msg = '削除失敗';
-    $query = '';
+    $mock_args = '';
 
     $mock = $this->getMock('\Testing\Part3\DB');
     $mock->expects($this->once())
          ->method('method_delete')
-         ->with($this->equalTo($query))
+         ->with($this->equalTo($mock_args))
          ->will($this->returnValue(false));
     \Testing\Part3\DI::bind('DB', $mock);
 
